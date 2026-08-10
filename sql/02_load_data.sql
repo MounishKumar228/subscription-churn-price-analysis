@@ -1,3 +1,9 @@
+ERROR 3948 (42000):
+Loading local data is disabled
+    
+*RUN:*
+SET GLOBAL local_infile = 1;
+
 LOAD DATA LOCAL INFILE 'C:/path/to/users.csv'
 INTO TABLE users
 FIELDS TERMINATED BY ','
