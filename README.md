@@ -1,49 +1,82 @@
-# Subscription Churn & Price Analysis
+# Subscription Churn & June 2026 Price Impact Analysis
+
+## Business Question
+
+The business reported that monthly churn increased from approximately 4.5% in May to nearly 17% in June after the monthly plan price increased from ₹399 to ₹449 on June 1.
+
+The objective was to:
+
+1. Verify the reported June churn.
+2. Identify what actually drove the June increase.
+3. Test whether the price increase explains the spike.
+4. Recommend whether the price should be rolled back.
+
+---
 
 ## Executive Recommendation
 
-**Do not roll back the ₹449 monthly price based on the June churn spike.**
+### Keep the ₹449 price for now. Do not roll it back based on June churn.
 
-The reported **17% June churn is not supported by the subscription data**. Using `ended_at` as the actual access-end date, excluding trial subscriptions and removing exact duplicate records, June paid monthly-plan churn was **11.17%**, compared with **3.71% in May**.
+The reported **~17% June churn could not be reproduced** using the specified churn definition.
 
-More importantly, the June increase was primarily a **cohort effect from the March acquisition campaign**, rather than evidence that the June 1 price increase caused the spike.
+Using paid monthly subscribers and `ended_at` as the actual access-end date:
 
-## What happened
+- **May churn: 3.7%**
+- **June churn: 11.2%**
 
-March was an abnormal acquisition month. New-user acquisition increased to **3,423 users**, compared with **1,442 in February** and **1,488 in April**. Paid social represented approximately **77% of March acquisition**, compared with roughly 20% in surrounding months.
+The June increase is heavily concentrated in the **March 2026 signup cohort**.
 
-The March campaign also created a large `LAUNCH60` subscription cohort at **₹160**, substantially below the normal ₹399 monthly price. When these subscriptions reached their end dates in June, they created a large concentration of churn.
+Of the **914** paid monthly subscriptions whose access ended in June, **572 came from the March 2026 cohort**.
 
-Of the **914 monthly subscriptions that ended in June**, **572 (62.6%) came from subscriptions started in March**. The March cohort's June churn was approximately **32.24%**, far above the surrounding cohorts.
+March was also the month of the acquisition campaign, creating an unusually large cohort. This means a large group of March-acquired subscribers reached their access-end point in June.
 
-The `LAUNCH60` group alone accounted for **516 June monthly ends (56.5%)**.
+The cohort effect is clear:
 
-## Why the ₹449 price increase is not proven to be the cause
+- June churn including March = **11.2%**
+- June churn excluding March = **5.3%**
 
-The business hypothesis is that the June 1 price increase from **₹399 to ₹449** caused June churn.
+Therefore, most of the June spike is explained by the March cohort rather than a broad increase across the entire subscriber base.
 
-The data does not support using June churn as that causal test.
+---
 
-The subscriptions that actually ended in June were subscribed at the previous prices/promotional prices. In particular, **none of the June-ended monthly subscriptions had a ₹449 starting price**. Therefore, the June churn spike cannot be directly attributed to customers being charged ₹449.
+## What About the ₹399 → ₹449 Price Increase?
 
-There is also an important timing distinction: `cancelled_at` records when a customer clicked cancel, while `ended_at` records when their paid access actually stopped. Churn analysis therefore uses `ended_at`.
+The June churn data does **not provide a clean test of the price increase**.
 
-## Recommendation
+The price increased on June 1, but the subscriptions ending in June largely belong to customers who entered the service before the price change. Therefore, June churn cannot be interpreted as a direct measure of customers reacting to ₹449.
 
-**Keep the monthly price at ₹449 for now. Do not roll it back on September 1 based on the June churn figure.**
+This does **not prove that the price increase has no effect**.
 
-The evidence indicates that June was dominated by a March campaign cohort reaching its subscription end date. Rolling the price back would give up the additional ₹50 of monthly revenue without addressing the main driver of June churn.
+The price effect should instead be evaluated when customers actually reach a renewal/payment point at ₹449.
 
-The next decision should be based on a clean post-price cohort analysis: compare customers actually exposed to ₹449 against comparable pre-price customers using renewal/churn and revenue retention. A rollback should only be considered if the incremental churn caused by ₹449 is persistent and large enough to outweigh the additional revenue per retained subscriber.
+### Recommendation
 
-## Methodology
+**Do not roll back the price on September 1 based on the June churn spike.**
 
-* Removed exact duplicate subscription records before analysis.
-* Excluded `is_trial = 1` rows from paid churn calculations.
-* Used `ended_at`, not `cancelled_at`, to measure actual churn.
-* Calculated churn from subscriptions active at the beginning of each month.
-* Analyzed June churn by subscription-start cohort.
-* Connected the March cohort to acquisition channel and `LAUNCH60`.
-* Kept the raw subscription table separate from the cleaned analytical dataset.
+Keep ₹449 and evaluate subsequent renewal/churn among customers actually exposed to the new price.
 
-See the `/sql` directory for the complete analysis and reproducible queries.
+A rollback should only be considered if the post-price cohort shows a persistent incremental churn increase large enough to outweigh the additional ₹50 monthly revenue per retained subscriber.
+
+---
+
+## Key Findings
+
+| Metric | Result |
+|---|---:|
+| Reported June churn | ~17% |
+| Verified June churn | **11.2%** |
+| May churn | **3.7%** |
+| March cohort June churn | **572** |
+| June churn excluding March cohort | **5.3%** |
+| Monthly price change | **₹399 → ₹449** |
+
+---
+
+## Why March Matters
+
+The March acquisition campaign produced an unusually large signup cohort.
+
+When June churners are grouped by their subscription start month, the March 2026 cohort is the largest contributor:
+
+```text
+March 2026 cohort → 572 June churns
